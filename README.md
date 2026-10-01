@@ -59,10 +59,21 @@
 
 ### `search_listings`
 
-- **What it does:**
+- **What it does:** 
+               Search the listings data for items matching a description, and optionally a
+               size and a price ceiling.
+               
 - **Inputs:** <!-- name and type each: `max_price` (float), not "a price" -->
-- **Returns:**
+               description: str,
+               size: str | None = None,
+               max_price: float | None = None,
+
+- **Returns:** 
+               A list of matching listing dicts, best match first.
+
 - **When it has nothing:**
+              Returns an empty list when nothing matches — an empty list, not None,
+              and not an exception.** Your loop branches on this.
 
 ### `suggest_outfit`
 
