@@ -41,6 +41,7 @@
 
 <!-- Three or four sentences: what a user asks for, and what they get back. -->
 
+Users enter a description, size, and maximum price for a clothing item they are looking for. The system searches through available thrift listings, filters and scores the results, and stops gracefully if no matches are found. For valid matches, it automatically passes the item into an outfit suggestion tool that pairs the find with the user's existing wardrobe.
 
 
 ---
@@ -62,32 +63,43 @@
 - **What it does:** 
                Search the listings data for items matching a description, and optionally a
                size and a price ceiling.
-               
 - **Inputs:** <!-- name and type each: `max_price` (float), not "a price" -->
                description: str,
                size: str | None = None,
                max_price: float | None = None,
-
 - **Returns:** 
                A list of matching listing dicts, best match first.
-
 - **When it has nothing:**
-              Returns an empty list when nothing matches — an empty list, not None,
-              and not an exception.** Your loop branches on this.
+               Returns an empty list when nothing matches — an empty list, not None,
+               and not an exception.** Your loop branches on this.
 
 ### `suggest_outfit`
 
 - **What it does:**
+               Given a thrifted item and the user's wardrobe, suggest one or two outfits.
 - **Inputs:**
+               new_item: dict
+               wardrobe: dict
 - **Returns:**
+               A non-empty string with outfit suggestions.
 - **When it has nothing:**
+               With an empty wardrobe, return general styling advice rather than
+               raising or returning "". Unit 4 has you trigger the empty wardrobe on
+               purpose, so decide now what it should do.
 
 ### `create_fit_card`
 
 - **What it does:**
+             Creates a formatted text-based fit card combining an existing outfit 
+             description with a newly added clothing item.
 - **Inputs:**
+             outfit: str
+             new_item: dict
 - **Returns:**
+             A two-to-four sentence caption with a full outfit.
 - **When it has nothing:**
+             If `outfit` is empty or whitespace, return a descriptive message rather
+             than raising.
 
 ---
 

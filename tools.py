@@ -57,10 +57,18 @@ def _keywords(text: str) -> set[str]:
     words = re.findall(r"[a-z0-9']+", (text or "").lower())
     return {w for w in words if w not in _STOPWORDS and len(w) > 1}
 
+# Code in class
+# def _size_tokens(size: str) -> set[str]:
+#     cleaned = re.sub(r"\([^)]*\)", " ", size or "") # drop parentheticals
+#     parts = [p.strip().upper() for p in cleaned.split("/")]
+#     return {p for p in parts if p}
+
+# Updated version to handle commas and spaces as well, for cases like "W30 L30" or "M, L"
 def _size_tokens(size: str) -> set[str]:
     cleaned = re.sub(r"\([^)]*\)", " ", size or "") # drop parentheticals
-    parts = [p.strip().upper() for p in cleaned.split("/")]
-    return {p for p in parts if p}
+    # Split by slashes, commas, or spaces to handle "W30 L30" or "M, L"
+    parts = re.split(r"[/,\s]+", cleaned)
+    return {p.strip().upper() for p in parts if p.strip()}
 
 def _size_matches(wanted: str, listing_size: str) -> bool:
     if not wanted:
@@ -124,7 +132,30 @@ def search_listings(
         python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"
     """
     # TODO: replace this with your implementation
-    return []
+    listings = load_listings()
+    query_words = set(description.lower().split())
+    if not query_words:
+        return []
+
+    scored = []
+    for item in listings:
+        if max_price is not None and item.get("price", 0) > max_price:
+            continue
+        
+        if size is not None:
+            item_size = str(item.get("size", "")).lower()
+            sizes = [s.strip() for s in item_size.replace("/", " ").split()]
+            if size.lower() not in sizes:
+                continue
+
+        text = f"{item.get('title', '')} {item.get('description', '')} {item.get('category', '')}".lower()
+        score = sum(1 for w in query_words if w in text)
+        
+        if score > 0:
+            scored.append((score, item))
+
+    scored.sort(key=lambda x: x[0], reverse=True)
+    return [item for _, item in scored[:10]]
 
 
 # ── Tool 2: suggest_outfit ────────────────────────────────────────────────────
@@ -158,7 +189,15 @@ def suggest_outfit(new_item: dict, wardrobe: dict) -> str:
         python -c "from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, load_listings; print(suggest_outfit(load_listings()[0], get_example_wardrobe()))"
     """
     # TODO: replace this with your implementation
-    return ""
+    
+    items = wardrobe.get("items", [])
+    if not items:
+        prompt = f"Give general styling advice and outfit ideas for this item: {new_item}"
+    else:
+        wardrobe_list = "\n".join(str(item) for item in items)
+        prompt = f"Suggest one or two outfits combining this new item ({new_item}) with these pieces the user already owns:\n{wardrobe_list}"
+    return generate(prompt) 
+""
 
 
 # ── Tool 3: create_fit_card ───────────────────────────────────────────────────
