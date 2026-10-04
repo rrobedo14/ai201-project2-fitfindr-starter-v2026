@@ -54,10 +54,10 @@ Given a query that matches no listings, the agent stops before calling
      compares session["selected_item"] against what actually reached
      suggest_outfit is the shape you're after. -->
 
+Given a search result selection, the unique ID and attributes of the listing passed to suggest_outfit and create_fit_card match the originally selected item without drift — 5 of 5 tries.
 
-
-**Why this target:**
-
+**Why this target:** 
+I picked 5 of 5 because state hand-off between tools must be exact; losing track of the item ID means generating a fit card for a completely different piece of clothing.
 
 
 ---
@@ -75,10 +75,10 @@ Given a query that matches no listings, the agent stops before calling
      sentence? A card longer than a caption anyone would post? Any of those can
      be turned into a number. -->
 
-
+Given identical inputs across multiple runs, the fit card varies in exact wording due to model temperature, but successfully includes the item, price, platform, and 2-to-4 sentence constraint — in at least 4 of 5 tries.
 
 **Why this target:**
-
+I picked 4 of 5 because language models are non-deterministic by design, so expecting identical phrasing defeats the purpose of creativity, while structural constraints still need high consistency.
 
 
 ---
@@ -92,11 +92,10 @@ Given a query that matches no listings, the agent stops before calling
      search respects a price ceiling — anything, as long as it names a number
      or an observable outcome. -->
 
-
+Given a wardrobe consisting entirely of absurdly contradictory items (like Victorian mourning capes and neon scuba gear), suggest_outfit successfully manages to style the Y2K shiny black biker shorts into a cohesive, avant-garde runway look rather than defaulting to safe basics — 5 of 5 tries.
 
 **Why this target:**
-
-
+I picked 5 of 5 because feeding the model wildly clashing, chaotic wardrobe data tests whether it can creatively synthesize nonsense into functional high-fashion satire without breaking character or crashing.
 
 ---
 
