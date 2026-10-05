@@ -117,13 +117,23 @@ Users enter a description, size, and maximum price for a clothing item they are 
      function have to be real. -->
 
 **Branch rule:**
+        If search_listings returns an empty list, put a message in
+        session["error"] naming what the user could change, and return the
+        session without calling suggest_outfit. Otherwise take the first
+        result, put it in session["selected_item"], and continue
 
 **Where it lives:** `agent.py::run_agent`
 
 **How the query is parsed:** <!-- regex, string splitting, or asking the model — say which -->
+        Regex pattern matching and string splitting (parse_query()) extracts size and maximum price constraints while isolating the remaining keywords for listing search.
 
 **What moves through the session:** <!-- which fields, in what order -->
-
+       1. session["parsed"] — structured breakdown of the user's request.
+       2. session["search_results"] — list of matching item dicts returned by search.
+       3. session["selected_item"] — the top-ranking item dict chosen from the results (if any match).
+       4. session["outfit_suggestion"] — string containing outfit advice combining the new item and wardrobe.
+       5. session["fit_card"] — final social media caption string.
+       6. session["error"] — error string populated if the search returns empty or the model is unavailable.
 ---
 
 ## Sample Run
@@ -192,6 +202,7 @@ $ python -c "from tools import search_listings; print(search_listings('graphic t
 ```
 Navy', 'description': 'Perfectly faded navy crewneck. Genuinely vintage — not manufactured distressed. Ribbed cuffs and hem. No graphics, clean.', 'category': 'tops', 'style_tags': ['vintage', 'basics', 'oversized', 'classic'], 'size': 'XL (fits oversized)', 'condition': 'good', 'price': 20.0, 'colors': ['navy'], 'brand': None, 'platform': 'thredUp'}, {'id': 'lst_015', 'title': 'Vintage Graphic Hoodie — Faded Black', 'description': 'Faded black pullover hoodie with barely-visible vintage graphic on the chest. Cozy interior. Some pilling but adds to the worn-in look.', 'category': 'tops', 'style_tags': ['vintage', 'grunge', 'graphic', 'streetwear'], 'size': 'L', 'condition': 'fair', 'price': 26.0, 'colors': ['black', 'charcoal'], 'brand': None, 'platform': 'depop'}]
 ```
+
 $ python -c "from tools import suggest_outfit; ..."
 python -c "from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, load_listings; print(suggest_outfit(load_listings()[0], get_example_wardrobe()))"
 
@@ -220,7 +231,6 @@ The search for the ultimate vintage 501s is officially over. Just paired these b
 
 ***
 
-
 ```
 
 ---
@@ -236,15 +246,21 @@ The search for the ultimate vintage 501s is officially over. Just paired these b
 
 **Moment 1**
 
-- *What I asked for:*
-- *What came back:*
+- *What I asked for:* 
+               I asked for the implementation of search_listings including the size filtering logic.
+- *What came back:* 
+               The initial implementation used a basic string replacement (item_size.replace('/', ' ').split()),  which failed to correctly parse comma-separated sizes or multi-space formats like "W30 L30" or "M, L".
 - *What I changed:*
+               I updated the size tokenization helper to use a regex split (re.split(r"[/,\s]+", cleaned)) so it robustly handles diverse listing formats without false negatives.
 
 **Moment 2**
 
 - *What I asked for:*
+               Guidance on structuring the fallback prompt inside suggest_outfit when a user has a completely empty wardrobe.
 - *What came back:*
+               A basic fallback string like "Wardrobe is empty. Style this item.", which caused the language model to produce confusing output asking where the user's clothes went or complaining about missing data.
 - *What I changed:*
+               I rewrote the prompt branch to explicitly frame the model as a personal stylist giving standalone styling advice for the thrifted item alone, keeping the conversational persona intact even without existing wardrobe items to cross-reference.
 
 <!-- ═══════════════════════ UNIT 4 — THE TEST ═══════════════════════
 
