@@ -137,6 +137,50 @@ Users enter a description, size, and maximum price for a clothing item they are 
 
 ```
 $ python app.py ask '...'
+python app.py ask 'vintage graphic tee under $30'
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: 9 items: Graphic Tee — 2003 Tour Bootleg Style, Vintage Band Tee — Faded Grey, Y2K Baby Tee — Butterfly Print … +6 more
+      →    9 match(es)
+[3] select_item
+      out: Graphic Tee — 2003 Tour Bootleg Style ($24.0, depop)
+[4] suggest_outfit
+      in:  Graphic Tee — 2003 Tour Bootleg Style ($24.0, depop)
+      out: Since you didn’t list the specific items you own, I’ve put together two versatile outfit formulas using classi…
+      →    10 wardrobe item(s)
+[5] create_fit_card
+      in:  Graphic Tee — 2003 Tour Bootleg Style ($24.0, depop)
+      out: Scored this ultimate 2003 tour bootleg tee and I am obsessed with the faded vintage wash! Throw it on with som…
+
+  Found:    Graphic Tee — 2003 Tour Bootleg Style — $24.0 on depop
+
+  Outfit:   Since you didn’t list the specific items you own, I’ve put together two versatile outfit formulas using classic pieces that pair effortlessly with a vintage 2003 bootleg-style graphic tee. 
+
+You can easily swap these in for the equivalent items in your wardrobe!
+
+### Outfit 1: Effortless & Edgy (Streetwear Vibe)
+*Since the tee has a slightly boxy, worn-in fit, this look leans into that relaxed, effortless aesthetic.*
+
+* **Top:** The Graphic Tee (let it hang loose for that authentic vintage drape).
+* **Bottoms:** Relaxed-fit straight-leg jeans (light wash or vintage wash to match the faded tee).
+* **Outerwear:** An oversized black leather biker jacket or a distressed denim jacket.
+* **Shoes:** Retro sneakers (like Nike Dunks, Adidas Sambas, or chunky New Balances).
+* **Accessories:** A minimalist silver chain necklace and a canvas crossbody bag.
+
+### Outfit 2: Casual & Cool (Elevated Everyday)
+*This look balances the casual nature of the graphic tee with cleaner lines for a put-together, smart-casual finish.*
+
+* **Top:** The Graphic Tee (tucked in loosely with a "French tuck" at the front).
+* **Bottoms:** Tailored wide-leg trousers or pleated chinos (in black, charcoal, or beige).
+* **Outerwear:** A structured blazer (oversized) to add a cool high-low contrast against the bootleg tee.
+* **Shoes:** Classic loafers or retro running shoes (depending on how dressy you want to go).
+* **Accessories:** A leather belt with a simple buckle and a minimalist tote bag. 
+
+*If you’d like to share the specific items you currently own from your list, let me know and I can tailor these exact combinations for you!*
+
+  Fit card: Scored this ultimate 2003 tour bootleg tee and I am obsessed with the faded vintage wash! Throw it on with some relaxed denimand a leather jacket for instant off-duty edge, or dress it up with tailored trousers. Grab this piece now on my Depop for just $24.00 before it's gone! 🎸✨
+
+2 model calls this session, 592 prompt + 465 output tokens
 
 ```
 
@@ -146,14 +190,36 @@ $ python app.py ask '...'
 $ python -c "from tools import search_listings; print(search_listings('graphic tee', max_price=30))"
 
 ```
-
+Navy', 'description': 'Perfectly faded navy crewneck. Genuinely vintage — not manufactured distressed. Ribbed cuffs and hem. No graphics, clean.', 'category': 'tops', 'style_tags': ['vintage', 'basics', 'oversized', 'classic'], 'size': 'XL (fits oversized)', 'condition': 'good', 'price': 20.0, 'colors': ['navy'], 'brand': None, 'platform': 'thredUp'}, {'id': 'lst_015', 'title': 'Vintage Graphic Hoodie — Faded Black', 'description': 'Faded black pullover hoodie with barely-visible vintage graphic on the chest. Cozy interior. Some pilling but adds to the worn-in look.', 'category': 'tops', 'style_tags': ['vintage', 'grunge', 'graphic', 'streetwear'], 'size': 'L', 'condition': 'fair', 'price': 26.0, 'colors': ['black', 'charcoal'], 'brand': None, 'platform': 'depop'}]
 ```
 $ python -c "from tools import suggest_outfit; ..."
+python -c "from tools import suggest_outfit; from utils.data_loader import get_example_wardrobe, load_listings; print(suggest_outfit(load_listings()[0], get_example_wardrobe()))"
+
+Since you didn't list the specific items in your wardrobe, I have created a **classic, versatile, and effortlessly cool everyday outfit**built around the vintage Levi's 501s. 
+
+Whenever you are ready, feel free to reply with the exact items in your closet (e.g., "a white tee, a black leather jacket, and Converse sneakers"), and I will tailor this specific to your wardrobe!
+
+### The Outfit: **"The Effortless Casual-Cool Look"**
+
+*   **The Base:** **Vintage Levi's 501 Jeans** (Medium wash with knee fading)
+*   **Top:** A classic tucked-in **white t-shirt** (or a simple neutral top) to let the high-waisted vintage silhouette shine.
+*   **Outerwear:** An **oversized blazer** or a **denim/leather jacket** layered on top for structure and contrast.
+*   **Shoes:** **Retro sneakers** (like Adidas Sambas or white leather tennis shoes) or **classic loafers** to dress it up slightly.
+*   **Accessories:** A **leather belt** (brown or black to match your shoes) tucked through the 501 loops, paired with a simple **gold necklace** or **crossbody bag**.
+
+**Why it works:** Medium-wash 501s have an inherent casual, timeless vibe. Pairing them with a simple top, a structured layer (like a blazer or jacket), and defined accessories (like a belt) instantly elevates the vintage denim from "just running errands" to a chic, put-together street-style look. 
+
+*Want a customized recommendation? Just reply with your actual items!*
 
 ```
 
 ```
 $ python -c "from tools import create_fit_card; ..."
+python -c "from tools import create_fit_card; from utils.data_loader import load_listings; print(create_fit_card('jeans and white sneakers', load_listings()[0]))"
+The search for the ultimate vintage 501s is officially over. Just paired these broken-in medium wash blues with my favorite white sneakers for that effortless 90s off-duty look. Snagged them on Depop for just $38 and I honestly might never take them off.
+
+***
+
 
 ```
 
