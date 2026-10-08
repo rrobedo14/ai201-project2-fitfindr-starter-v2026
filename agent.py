@@ -153,6 +153,7 @@ import re
 import config
 import trace
 from tools import search_listings, suggest_outfit, create_fit_card
+from mcp_client import call_tool
 from generate import ModelUnavailable
 
 
