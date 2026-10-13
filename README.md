@@ -346,9 +346,30 @@ matching query completes  (example wardrobe)
 | 4 |  |  |  |  |
 | 5 |  |  |  |  |
 
+| # | Criterion                                   | Target | Verdict   | How I decided |
+|---|---------------------------------------------|--------|-----------|---------------|
+| 1 | Matching query completes all three tools    | 4/5    | MET (5/5) | Verified that all 5 tries successfully traversed the complete loop (`parse_query` → `search_listings` → `select_item` → `suggest_outfit` → `create_fit_card`) and generated a final fit card. |
+| 2 | Impossible query stops before second tool   | 5/5    | MET (5/5) | Observed that when `search_listings` returned an empty list (`[]`), the loop's branch logic caught the empty state and halted execution before calling `suggest_outfit` in 5 out of 5 runs. |
+| 3 | State hand-off without drift                | 5/5    | MET (5/5) | Tracked the selected item (`Graphic Tee — 2003 Tour Bootleg Style ($24.0, depop)`) from `select_item` through `suggest_outfit` to `create_fit_card`, confirming zero string or attribute mutation across all 5 runs. |
+| 4 | Fit card generation and constraints         | 4/5    | MET (4/5) | Verified that 4 out of 5 runs generated valid, non-deterministic captions within character constraints. Try 3 stopped early due to an external model/rate-limit error, resulting in 4 successful passes. |
+| 5 | Chaotic wardrobe avant-garde styling        | 5/5    | MET (5/5) | Confirmed that when queried with `Y2K shiny black biker shorts`, the model completed all 5 runs successfully, synthesizing cohesive outfit suggestions and fit cards without crashing or defaulting to safe error fallbacks. |
+
 **Diagnoses**
 
+Diagnosis
+Where it failed: Step [5] (create_fit_card) — The Model
 
+Pattern Identification:
+Across all 25 total evaluation runs (5 scenarios × 5 tries), there was only 1 failure (Try 3 of Criterion 4). Because this single miss was caused by an isolated rate limit spike at Step [5] create_fit_card, there is no systematic pattern or recurring defect across tools, branching logic, state sessions, or prompt formatting.
+
+Were the targets too low?
+Yes. Setting target thresholds at 4/5 for Criterion 1 and Criterion 4 was overly lenient given the agent's actual stability. The agent achieved a 100% pass rate on Criteria 1, 2, 3, and 5, and only missed Try 3 of Criterion 4 due to an external API rate limit—not a flaw in the prompt, tool pipeline, or state hand-off logic.
+
+Criterion to Tighten:
+
+Criterion 4 (Fit card generation and constraints): Tighten the target from 4/5 to 5/5, and implement retry backoff logic directly inside the create_fit_card wrapper to handle transient rate limits seamlessly without dropping the run.
+
+Criterion 1 (Matching query completes): Raise the target from 4/5 to 5/5 to require absolute consistency across deterministic query completions.
 
 ---
 
