@@ -47,6 +47,28 @@ SCENARIOS = [
     # For a fit-card criterion, you probably want the SAME query listed more
     # than once, or several different items, depending on what your criterion
     # actually says.
+
+    {
+        # Criterion 3: State hand-off consistency without drift
+        "name": "state hand-off without drift",
+        "query": "vintage graphic tee under $30",
+        "wardrobe": "example",
+        "criterion": 3,
+    },
+    {
+        # Criterion 4: Fit card variable wording with structural constraints (repeat run)
+        "name": "fit card generation and constraints",
+        "query": "vintage graphic tee under $30",
+        "wardrobe": "example",
+        "criterion": 4,
+    },
+    {
+        # Criterion 5: Chaotic wardrobe avant-garde styling
+        "name": "chaotic wardrobe avant-garde styling",
+        "query": "Y2K shiny black biker shorts",
+        "wardrobe": "example",
+        "criterion": 5,
+    },
 ]
 
 WARDROBES = ("example", "empty")

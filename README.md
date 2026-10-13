@@ -280,18 +280,41 @@ The search for the ultimate vintage 501s is officially over. Just paired these b
      `python run_eval.py --label before` runs everything and writes the table
      into results/. Paste it here and fill in the verdicts. -->
 
-| Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
-|---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| Criterion                                    | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict     |
+|--------------------------------------------- |--------|-------|-------|-------|-------|-------|-------------|
+| 1. Matching query completes all three tools  | 4/5    | PASS  | PASS  | PASS  | PASS  | PASS  | MET (5/5)   |
+| 2. Impossible query stops before second tool | 5/5    | PASS  | PASS  | PASS  | PASS  | PASS  | MET (5/5)   |
+| 3. State hand-off without drift              | 5/5    | PASS  | PASS  | PASS  | PASS  | PASS  | MET (5/5)   |
+| 4. Fit card generation and constraints       | 4/5    | PASS  | PASS  | FAIL  | PASS  | PASS  | MET (4/5)   |
+| 5. Chaotic wardrobe avant-garde styling      | 5/5    | PASS  | PASS  | PASS  | PASS  | PASS  | MET (5/5)   |
 
 **Real output from one try**, pasted as text, naming the file and function
 that produced it:
 
 ```
+File: app.py
+
+Function: run_agent
+
+matching query completes  (example wardrobe)
+  query: vintage graphic tee under $30
+[1] parse_query
+      in:  vintage graphic tee under $30
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: 9 items: Graphic Tee — 2003 Tour Bootleg Style, Vintage Band Tee — Faded Grey, Y2K Baby Tee — Butterfly Print … +6 more
+      →    9 match(es)
+[3] select_item
+      out: Graphic Tee — 2003 Tour Bootleg Style ($24.0, depop)
+[4] suggest_outfit
+      in:  Graphic Tee — 2003 Tour Bootleg Style ($24.0, depop)
+      out: Since you didn't list the specific items you already own, I’ll base these suggestions on the most versatile wa…
+      →    10 wardrobe item(s)
+[5] create_fit_card
+      in:  Graphic Tee — 2003 Tour Bootleg Style ($24.0, depop)
+      out: Obsessed with the faded wash and boxy fit of this 2003 tour bootleg tee. It gives major off-duty model energy …
+  try 1: completed — fit card 270 chars
 
 ```
 
@@ -344,12 +367,73 @@ that produced it:
 **Happy path**
 
 ```
+$ python app.py ask "vintage graphic tee under $30" --trace
+[1] parse_query
+      in:  vintage graphic tee under 0
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: 10 items: Graphic Tee — 2003 Tour Bootleg Style, Y2K Baby Tee — Butterfly Print, Mesh Long-Sleeve Top — Black … +7 more
+      →    10 match(es)
+[3] select_item
+      out: Graphic Tee — 2003 Tour Bootleg Style ($24.0, depop)
+[4] suggest_outfit
+      in:  Graphic Tee — 2003 Tour Bootleg Style ($24.0, depop)
+      out: Since you didn’t list the specific items you own, I’ve put together two versatile outfit formulas using classi…
+      →    10 wardrobe item(s)
+[5] create_fit_card
+      in:  Graphic Tee — 2003 Tour Bootleg Style ($24.0, depop)
+      out: Scored this ultimate 2003 tour bootleg tee and I am obsessed with the faded vintage wash! Throw it on with som…
 
+  Found:    Graphic Tee — 2003 Tour Bootleg Style — $24.0 on depop
+
+  Outfit:   Since you didn’t list the specific items you own, I’ve put together two versatile outfit formulas using classic pieces that pair effortlessly with a vintage 2003 bootleg-style graphic tee. 
+
+You can easily swap these in for the equivalent items in your wardrobe!
+
+### Outfit 1: Effortless & Edgy (Streetwear Vibe)
+*Since the tee has a slightly boxy, worn-in fit, this look leans into that relaxed, effortless aesthetic.*
+
+* **Top:** The Graphic Tee (let it hang loose for that authentic vintage drape).
+* **Bottoms:** Relaxed-fit straight-leg jeans (light wash or vintage wash to match the faded tee).
+* **Outerwear:** An oversized black leather biker jacket or a distressed denim jacket.
+* **Shoes:** Retro sneakers (like Nike Dunks, Adidas Sambas, or chunky New Balances).
+* **Accessories:** A minimalist silver chain necklace and a canvas crossbody bag.
+
+### Outfit 2: Casual & Cool (Elevated Everyday)
+*This look balances the casual nature of the graphic tee with cleaner lines for a put-together, smart-casual finish.*
+
+* **Top:** The Graphic Tee (tucked in loosely with a "French tuck" at the front).
+* **Bottoms:** Tailored wide-leg trousers or pleated chinos (in black, charcoal, or beige).
+* **Outerwear:** A structured blazer (oversized) to add a cool high-low contrast against the bootleg tee.
+* **Shoes:** Classic loafers or retro running shoes (depending on how dressy you want to go).
+* **Accessories:** A leather belt with a simple buckle and a minimalist tote bag. 
+
+*If you’d like to share the specific items you currently own from your list, let me know and I can tailor these exact combinations for you!*
+
+  Fit card: Scored this ultimate 2003 tour bootleg tee and I am obsessed with the faded vintage wash! Throw it on with some relaxed denimand a leather jacket for instant off-duty edge, or dress it up with tailored trousers. Grab this piece now on my Depop for just $24.00 before it's gone! 🎸✨
+
+0 model calls this session, 2 served from cache
 ```
 
 **Empty search**
 
 ```
+$ python app.py ask '...' --trace
+[1] parse_query
+      in:  ...
+      out: dict with keys: description, size, max_price
+[2] search_listings (via MCP)
+      in:  dict with keys: description, size, max_price
+      out: [] (empty)
+      →    0 match(es)
+[3] branch
+      →    search returned []: stopping before suggest_outfit
+
+  Nothing in the listings matched description '...'.
+Things to change: try broader words — 'jacket' finds more than 'cropped corduroy jacket'.
+
+0 model calls this session
 
 ```
 
