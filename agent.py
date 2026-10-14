@@ -317,18 +317,6 @@ def run_agent(query: str, wardrobe: dict) -> dict:
         session["selected_item"] = results[0]
         trace.step("select_item", returned=session["selected_item"])
 
-        '''steps += 1
-        trace.check_iterations(steps)
-        session["outfit_suggestion"] = suggest_outfit(
-            session["selected_item"], session["wardrobe"]
-        )
-        trace.step(
-            "suggest_outfit",
-            inputs=session["selected_item"],
-            returned=session["outfit_suggestion"],
-            note=f"{len(session['wardrobe'].get('items') or [])} wardrobe item(s)",
-        )'''
-
         '''Added a check for empty wardrobe before calling suggest_outfit, to avoid errors when wardrobe is empty.'''
         steps += 1
         trace.check_iterations(steps)

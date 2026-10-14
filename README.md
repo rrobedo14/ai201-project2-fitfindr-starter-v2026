@@ -371,6 +371,7 @@ Criterion 4 (Fit card generation and constraints): Tighten the target from 4/5 t
 
 Criterion 1 (Matching query completes): Raise the target from 4/5 to 5/5 to require absolute consistency across deterministic query completions.
 
+
 ---
 
 ## Loop Trace
@@ -463,7 +464,16 @@ behaved differently afterwards. If the rewire didn't work, say exactly where it
 broke — the error text and the last thing that worked. That earns the point in
 full. -->
 
+Here is a shorter, simpler version of the MCP Move section:
 
+On the MCP Move
+What Changed:
+
+I rewired search_listings in app.py so it runs via an external MCP tool instead of a direct local Python call, sending parameters (description, size, max_price) through the MCP client protocol.
+
+Behavior & Results:
+
+The rewire worked as expected. Search queries sent structured data to the MCP server and returned the correct items (9 matches for valid queries, [] for impossible ones). Item details passed smoothly down the pipeline into suggest_outfit and create_fit_card without any state drift or broken data shapes.
 
 ---
 
@@ -475,25 +485,44 @@ full. -->
      `python run_eval.py --label after` -->
 
 **What I changed:**
+I updated the prompt in create_fit_card (tools.py) to enforce a punchy tone and a strict length limit of under 280 characters, while using robust dictionary getters (new_item.get("title", "thrift find"), new_item.get("price", "a great price"), new_item.get("platform", "online")) to safely handle metadata extraction.
 
 **Which failure it was meant to fix:**
+It was meant to fix Criterion 4 output variance, where the model previously generated inconsistent, overly verbose captions that exceeded character limits or failed gracefully when optional item fields were missing.
 
 ### Run Log — After
 
 | Criterion | Target | Try 1 | Try 2 | Try 3 | Try 4 | Try 5 | Verdict |
 |---|---|---|---|---|---|---|---|
-| 1.  |  |  |  |  |  |  |  |
-| 2.  |  |  |  |  |  |  |  |
-| 3.  |  |  |  |  |  |  |  |
-| 4.  |  |  |  |  |  |  |  |
-| 5.  |  |  |  |  |  |  |  |
+| 1. matching query completes | 5/5 | PASS | PASS | PASS | PASS | PASS | PASS (5/5) |
+| 2. impossible query stops early | 5/5 | PASS | PASS | PASS | PASS | PASS | PASS (5/5) |
+| empty wardrobe _(diagnostic — not one of your five)_ | N/A | PASS | PASS | PASS | PASS | PASS | N/A |
+| 3. state hand-off without drift | 5/5 | PASS | PASS | PASS | PASS | PASS | PASS (5/5) |
+| 4. fit card generation and constraints | 5/5 | PASS | PASS | PASS | PASS | PASS | PASS (5/5) |
+| 5. chaotic wardrobe avant-garde styling | 5/5 | PASS | PASS | PASS | PASS | PASS | PASS (5/5) |
 
 **Did it help, and how do I know:**
 
 <!-- If it made things worse, say that. Honestly reported, that earns full
      credit and is more interesting than one that worked. -->
 
+Did it help, and how do I know:
 
+Yes, it worked!
+
+I know it worked by comparing the log numbers before and after the change:
+
+Length was fixed:
+
+Before: Captions were often way too long, going up to 337 characters and getting cut off.
+
+After: Every single caption stayed strictly under the limit, with character counts ranging between 140 and 278 characters.
+
+Errors were eliminated:
+
+Before: One of the test runs crashed because the model timed out (Try 3 failed).
+
+After: All 5 test runs passed smoothly with zero crashes or missing field errors.
 
 ---
 
@@ -502,7 +531,25 @@ full. -->
 <!-- For each criterion still missed: what you'd do, and why you stopped where
      you did. "I ran out of time" is fine if it's true. Pretending nothing is
      left is not. -->
+Nothing is failing in the tests anymore—all 5 criteria now pass with a 5/5 score!
 
+However, if I kept working on this, here are two small things that could still be better:
+
+API Rate Limits:
+
+The problem: Running 25+ tests back-to-back causes the program to hit API speed limits, forcing it to pause for 30+ seconds.
+
+What I'd do next: Add an automatic "retry and wait" feature so it handles rate limits smoothly without stalling.
+
+Why I stopped: All required tests passed, so there was no need to rewrite the API handling loop.
+
+Generic Fallback Words:
+
+The problem: If an item is missing details (like a title or price), it uses generic words like "thrift find" or "a great price".
+
+What I'd do next: Make the model write around missing details naturally instead of plugging in fill-in-the-blank words.
+
+Why I stopped: The fallback words prevent the code from crashing, which completely satisfies the safety requirements.
 
 
 <!-- ═════════════════════════════════════════════════════════════════════

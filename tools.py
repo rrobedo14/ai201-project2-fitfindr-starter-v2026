@@ -107,11 +107,20 @@ def create_fit_card(outfit: str, new_item: dict) -> str:
     price = new_item.get("price", "a great price")
     platform = new_item.get("platform", "online")
 
-    prompt = (
+    '''prompt = (
         f"Write a short social media caption (2 to 4 sentences) for this thrift find. "
         f"Item: {title}, Price: ${price}, Platform: {platform}. "
         f"Outfit context: {outfit}. "
         "Make it sound like a real person posting about their find, mention the price and platform once each, and capture a specific vibe."
+    ) '''
+
+    '''Changed the prompt to be punchy and under 280 characters'''
+    prompt = (
+        f"Write a punchy social media caption for this fit. "
+        f"Item: {title}, Price: {price}, Platform: {platform}. "
+        f"Outfit context: {outfit}. "
+        "Make it sound like a real person posting about their find, mention the price and platform once each, and keep it strictly under 280 characters."
     )
+
 
     return generate(prompt)
